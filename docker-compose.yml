@@ -1,0 +1,6 @@
+squid1:
+  image: s035779/squid:1.1
+  ports:
+   - 54321:3128
+  volumes_file
+
