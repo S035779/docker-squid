@@ -9,7 +9,7 @@ docker_run() {
         addr=`echo $line | cut -d ',' -f 1`
         port=`echo $line | cut -d ',' -f 2`
         name=`echo $line | cut -d ',' -f 3`
-        docker run -d -p $addr:$port:3128 --name $name s035779/docker-squid
+        docker container run -d -p $addr:$port:3128 --name $name s035779/docker-squid
     done
 }
 
@@ -18,7 +18,7 @@ docker_start() {
     for line in `cat $FILE_I`
     do
         name=`echo $line | cut -d ',' -f 3`
-        docker start $name
+        docker container start $name
     done
 }
 
@@ -27,13 +27,16 @@ docker_stop() {
     for line in `cat $FILE_I`
     do
         name=`echo $line | cut -d ',' -f 3`
-        docker stop $name
+        docker container stop $name
     done
 }
 
 docker_rm() {
     echo 'Docker Remove...'
+    docker container prune
+    docker image prune
     docker system prune
+    docker image ls
 }
 
 docker_logs() {
@@ -41,7 +44,7 @@ docker_logs() {
     for line in `cat $FILE_I`
     do
         name=`echo $line | cut -d ',' -f 3`
-        docker logs $name
+        docker container logs $name
     done
 }
 
@@ -51,7 +54,7 @@ docker_inspect() {
     do
         name=`echo $line | cut -d ',' -f 3`
         echo "--- squid$i ---"
-        docker inspect $name | jq ".[0].NetworkSettings.IPAddress"
+        docker container inspect $name | jq ".[0].NetworkSettings.IPAddress"
     done
 }
 
@@ -68,7 +71,7 @@ docker_test() {
 
 docker_status() {
     echo 'Docker status...'
-    docker ps
+    docker container ls -al
     docker system df
 }
 
@@ -79,6 +82,7 @@ docker_csv() {
         echo "${line},54321,squid${RANDOM}" >> $FILE_I
     done
 }
+
 if [ $1 = run ]; then
     docker_run
 elif [ $1 = start ]; then
