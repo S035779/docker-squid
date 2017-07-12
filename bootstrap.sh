@@ -72,6 +72,13 @@ docker_status() {
     docker system df
 }
 
+docker_csv() {
+    rm $FILE_I
+    ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.0.[0-9]+)\/.*$/\1/p' | while read line
+    do
+        echo "${line},54321,squid${RANDOM}" >> $FILE_I
+    done
+}
 if [ $1 = run ]; then
     docker_run
 elif [ $1 = start ]; then
@@ -88,5 +95,7 @@ elif [ $1 = test ]; then
     docker_test
 elif [ $1 = status ]; then
     docker_status
+elif [ $1 = csv ]; then
+    docker_csv
 fi
 
