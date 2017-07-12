@@ -33,11 +33,7 @@ docker_stop() {
 
 docker_rm() {
     echo 'Docker Remove...'
-    for line in `cat $FILE_I`
-    do
-        name=`echo $line | cut -d ',' -f 3`
-        docker rm $name
-    done
+    docker system prune
 }
 
 docker_logs() {
@@ -70,26 +66,25 @@ docker_test() {
     done
 }
 
+docker_status() {
+    echo 'Docker status...'
+    docker ps
+    docker system df
+}
+
 if [ $1 = run ]; then
     docker_run
-    docker ps
 elif [ $1 = start ]; then
     docker_start
-    docker ps
 elif [ $1 = stop ]; then
     docker_stop
-    docker ps -a
 elif [ $1 = rm ]; then
     docker_rm
-    docker ps -a
 elif [ $1 = logs ]; then
     docker_logs
-    docker ps
 elif [ $1 = inspect ]; then
     docker_inspect
-    docker ps
 elif [ $1 = test ]; then
     docker_test
-    docker ps
 fi
 
