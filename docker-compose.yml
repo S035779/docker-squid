@@ -1,5 +1,0 @@
-squid1:
-  image: s035779/docker-squid
-  ports:
-   - 8080:3128
-
