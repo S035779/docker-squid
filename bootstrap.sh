@@ -71,7 +71,7 @@ docker_test() {
 
 docker_status() {
     echo 'Docker status...'
-    docker container ls -al
+    docker container ls -a
     docker system df
 }
 
