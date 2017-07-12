@@ -6,13 +6,14 @@ EXPOSE 3128/tcp
 WORKDIR /tmp
 
 # Install Squid
-RUN groupadd -r squid && useradd -r -g squid squid
-RUN yum -y update && yum -y install squid httpd-tools \
- && mv /etc/squid/squid.conf /etc/squid/squid.conf.dist
+RUN set -x && \
+    groupadd -r squid && useradd -r -g squid squid && \
+    yum -y update && yum -y install squid httpd-tools && \
+    mv /etc/squid/squid.conf /etc/squid/squid.conf.dist
 
 COPY conf/squid.conf.tmpl /etc/squid/squid.conf
 COPY conf/.htpasswd /etc/squid/.htpasswd
 
 USER squid
-CMD [ "-N", "-f", $SQUID_CONF ]
-ENTRYPOINT ["/usr/sbin/squid"]
+ENTRYPOINT [ "/usr/sbin/squid" ]
+CMD [ "-N", "-f", "/etc/squid/squid.conf" ]
