@@ -1,6 +1,5 @@
 squid1:
-  image: s035779/squid:1.1
+  image: s035779/docker-squid
   ports:
-   - 54321:3128
-  volumes_file
+   - 8080:3128
 
