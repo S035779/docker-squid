@@ -86,5 +86,7 @@ elif [ $1 = inspect ]; then
     docker_inspect
 elif [ $1 = test ]; then
     docker_test
+elif [ $1 = status ]; then
+    docker_status
 fi
 
