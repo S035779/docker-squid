@@ -64,7 +64,8 @@ docker_test() {
     do
         addr=`echo $line | cut -d ',' -f 1`
         port=`echo $line | cut -d ',' -f 2`
-        echo "--- proxy port:$port ---"
+        name=`echo $line | cut -d ',' -f 3`
+        echo "--- [ $name ] proxy --> $addr:$port ---"
         curl -U test1:test1 -x $addr:$port --silent --head https://www.google.com | head -2
     done
 }
