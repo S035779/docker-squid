@@ -3,7 +3,7 @@
 FILE_I="csv/address.csv"
 
 docker_run() {
-    echo 'Docker Run...'
+    echo '>>> Docker Run...'
     for line in `cat $FILE_I`
     do
         addr=`echo $line | cut -d ',' -f 1`
@@ -11,40 +11,43 @@ docker_run() {
         name=`echo $line | cut -d ',' -f 3`
         docker container run -d -p $addr:$port:3128 --name $name s035779/docker-squid
     done
+    echo ''
 }
 
 docker_start() {
-    echo 'Docker Start...'
+    echo '>>> Docker Start...'
     for line in `cat $FILE_I`
     do
         name=`echo $line | cut -d ',' -f 3`
         docker container start $name
     done
+    echo ''
 }
 
 docker_stop() {
-    echo 'Docker Stop...'
+    echo '>>> Docker Stop...'
     for line in `cat $FILE_I`
     do
         name=`echo $line | cut -d ',' -f 3`
         docker container stop $name
     done
+    echo ''
 }
 
 docker_rm() {
-    echo 'Docker Remove...'
+    echo '>>> Docker container remove...'
     docker container prune
     echo ''
-    docker image prune
+    echo '>>> Docker image remove...'
+    docker rmi $(docker images -q)
     echo ''
+    echo '>>> Docker volume remove...'
     docker system prune
     echo ''
-    echo 'Docker image list...'
-    docker image ls
 }
 
 docker_logs() {
-    echo 'Docker Logs...'
+    echo '>>> Docker Logs...'
     for line in `cat $FILE_I`
     do
         addr=`echo $line | cut -d ',' -f 1`
@@ -53,10 +56,11 @@ docker_logs() {
         echo "<<< [ $name ] proxy --> $addr:$port <<<"
         docker container logs $name
     done
+    echo ''
 }
 
 docker_inspect() {
-    echo 'Docker Inspect...'
+    echo '>>> Docker Inspect...'
     for line in `cat $FILE_I`
     do
         addr=`echo $line | cut -d ',' -f 1`
@@ -65,10 +69,11 @@ docker_inspect() {
         echo "<<< [ $name ] proxy --> $addr:$port <<<"
         docker container inspect $name | jq ".[0].NetworkSettings.IPAddress"
     done
+    echo ''
 }
 
 docker_test() {
-    echo 'Docker Testing...'
+    echo '>>> Docker Testing...'
     for line in `cat $FILE_I`
     do
         addr=`echo $line | cut -d ',' -f 1`
@@ -77,18 +82,24 @@ docker_test() {
         echo "<<< [ $name ] proxy --> $addr:$port <<<"
         curl -U test1:test1 -x $addr:$port --silent --head https://www.google.com | head -2
     done
+    echo ''
 }
 
 docker_status() {
-    echo 'Docker container list...'
+    echo '>>> Docker container list...'
     docker container ls -a
     echo ''
-    echo 'Docker systen usage...'
+    echo '>>> Docker image list...'
+    docker image ls
+    echo ''
+    echo '>>> Docker systen usage...'
     docker system df
+    echo ''
 }
 
 docker_csv() {
     rm $FILE_I
+    echo '>>> Docker ip list...'
     ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.0.[0-9]+)\/.*$/\1/p' | while read line
     do
         addr=`echo $line`
@@ -97,35 +108,34 @@ docker_csv() {
         echo ">>> [ $name ] proxy --> $addr:$port >>>"
         echo "${addr},${port},${name}" >> $FILE_I
     done
+    echo ''
 }
 
 docker_build() {
-    echo 'Docker image build...'
+    echo '>>> Docker image build...'
     docker image build -t s035779/docker-squid .
     echo ''
-    echo 'Docker image list...'
-    docker image ls
 }
 
 if [ $1 = run ]; then
+    docker_csv
+    docker_build
     docker_run
+    docker_test
+    docker_status
 elif [ $1 = start ]; then
     docker_start
+    docker_status
 elif [ $1 = stop ]; then
     docker_stop
-elif [ $1 = rm ]; then
-    docker_rm
-elif [ $1 = logs ]; then
-    docker_logs
-elif [ $1 = inspect ]; then
-    docker_inspect
-elif [ $1 = test ]; then
-    docker_test
+    docker_status
 elif [ $1 = status ]; then
     docker_status
-elif [ $1 = csv ]; then
-    docker_csv
-elif [ $1 = build ]; then
-    docker_build
+elif [ $1 = test ]; then
+    docker_inspect
+    docker_test
+    docker_logs
+elif [ $1 = remove ]; then
+    docker_rm
 fi
 
