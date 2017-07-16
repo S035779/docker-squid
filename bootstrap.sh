@@ -80,7 +80,7 @@ docker_test() {
         port=`echo $line | cut -d ',' -f 2`
         name=`echo $line | cut -d ',' -f 3`
         echo "<<< [ $name ] proxy --> $addr:$port <<<"
-        curl -U test1:test1 -x $addr:$port --silent --head https://www.google.com | head -2
+        curl -U test1:test1_password -x $addr:$port --silent --head https://www.google.com | head -2
     done
     echo ''
 }
@@ -121,20 +121,18 @@ if [ $1 = run ]; then
     docker_csv
     docker_build
     docker_run
-    docker_test
-    docker_status
 elif [ $1 = start ]; then
     docker_start
-    docker_status
 elif [ $1 = stop ]; then
     docker_stop
-    docker_status
 elif [ $1 = status ]; then
     docker_status
 elif [ $1 = test ]; then
-    docker_inspect
     docker_test
+elif [ $1 = logs ]; then
     docker_logs
+elif [ $1 = inspect ]; then
+    docker_inspect
 elif [ $1 = remove ]; then
     docker_rm
 fi
