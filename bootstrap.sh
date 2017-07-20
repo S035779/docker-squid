@@ -100,7 +100,7 @@ docker_status() {
 docker_csv() {
     rm $FILE_I
     echo '>>> Docker ip list...'
-    ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.0.[0-9]+)\/.*$/\1/p' | while read line
+    ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.[0-9]+.[0-9]+)\/.*$/\1/p' | while read line
     do
         addr=`echo $line`
         port=`echo 54321`
