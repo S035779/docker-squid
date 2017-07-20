@@ -97,7 +97,7 @@ docker_status() {
     echo ''
 }
 
-docker_csv() {
+docker_csv-ip() {
     rm $FILE_I
     echo '>>> Docker ip list...'
     ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.[0-9]+.[0-9]+)\/.*$/\1/p' | while read line
@@ -111,6 +111,23 @@ docker_csv() {
     echo ''
 }
 
+docker_csv-port() {
+    rm $FILE_I
+    echo '>>> Docker ip list...'
+    ip addr show | sed  -n -E 's/^[ \t]*inet[ \t]*(10.0.[0-9]+.[0-9]+)\/.*$/\1/p' | while read line
+    do
+        for i in {54321..54340}
+        do
+            addr=`echo $line`
+            port=`echo $i`
+            name=`echo squid${RANDOM}`
+            echo ">>> [ $name ] proxy --> $addr:$port >>>"
+            echo "${addr},${port},${name}" >> $FILE_I
+        done
+    done
+    echo ''
+}
+
 docker_build() {
     echo '>>> Docker image build...'
     docker image build -t s035779/docker-squid .
@@ -118,7 +135,11 @@ docker_build() {
 }
 
 if [ $1 = run ]; then
-    docker_csv
+    docker_csv-ip
+    docker_build
+    docker_run
+elif [ $1 = run2 ]; then
+    docker_csv-port
     docker_build
     docker_run
 elif [ $1 = start ]; then
