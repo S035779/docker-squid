@@ -9,7 +9,8 @@ docker_run() {
         addr=`echo $line | cut -d ',' -f 1`
         port=`echo $line | cut -d ',' -f 2`
         name=`echo $line | cut -d ',' -f 3`
-        docker container run -d -p $addr:$port:3128 --name $name s035779/docker-squid
+        docker network create $name
+        docker container run -d -p $addr:$port:3128 --net=$name --name $name s035779/docker-squid
     done
     echo ''
 }
@@ -41,7 +42,7 @@ docker_rm() {
     echo '>>> Docker image remove...'
     docker rmi $(docker images -q)
     echo ''
-    echo '>>> Docker volume remove...'
+    echo '>>> Docker resource remove...'
     docker system prune
     echo ''
 }
@@ -88,6 +89,9 @@ docker_test() {
 docker_status() {
     echo '>>> Docker container list...'
     docker container ls -a
+    echo ''
+    echo '>>> Docker network list...'
+    docker network ls
     echo ''
     echo '>>> Docker image list...'
     docker image ls
